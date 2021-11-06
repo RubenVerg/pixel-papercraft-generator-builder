@@ -6,3 +6,4 @@
 /dist
 /src/generators/minecraft-block/textures-original
 *.bs.js
+/target
