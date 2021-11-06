@@ -9,11 +9,12 @@ scalaVersion := "3.1.0"
 scalacOptions ++= "-feature -deprecation".split(" ").toSeq
 
 libraryDependencies ++= Seq(
-
+  // "org.scala-js" %%% "scalajs-dom" % "2.0.0",
+  "com.lihaoyi" %%% "scalatags" % "0.10.0" cross CrossVersion.for3Use2_13
 )
 
 scalaJSUseMainModuleInitializer := false
-scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
+scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
 
-Test / scalaJSUseMainModuleInitializer := false
-Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
+Test / scalaJSUseTestModuleInitializer := false
+Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }

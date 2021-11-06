@@ -1,6 +1,11 @@
 package com.pixelpapercraft.generator
 package input
 
+import concurrent.ExecutionContext.Implicits.global
+
+import com.pixelpapercraft.generator.render.RenderInputs
+
+import scala.concurrent.Future
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 /**
@@ -14,6 +19,15 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("TextureInput")
 case class TextureInput(label: String, width: Int, height: Int, choices: Seq[Texture])
-  extends Input[Texture](label):
+  extends Input[Future[Texture]](label):
+  var id: Option[String] = None
+
   @JSExport
-  override def read() = if choices.isEmpty then ??? else choices.head
+  override def create() =
+    if (id.isEmpty)
+      id = Some(RenderInputs.createImage(label/*, choices*/))
+    id.get
+
+  @JSExport
+  override def read() =
+    id.map(RenderInputs.getImage).getOrElse(Future.successful("data:image/png;base64,")).map(Texture(_))

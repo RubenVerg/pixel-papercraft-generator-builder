@@ -1,25 +1,26 @@
 package com.pixelpapercraft.generator
 package example
 
+import concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 extension[A](a: A)
   def runIf[B >: A](cond: => Boolean)(f: A => B): B = if cond then f(a) else a
 
-val background = Image("fake://background.png")
-val folds = Image("fake://folds.png")
+val background = Image(Base64Images.background)
+val folds = Image(Base64Images.folds)
 
 val showFolds = input.BooleanInput("Show Folds", true)
 val skin = input.TextureInput("Skin", 64, 64, Seq(Texture()))
 
-def setup(generator: Generator) =
+def setup(generator: Generator): Unit =
   generator.pages(0).draw(background, 0, 0)
-  generator
 
-def change(generator: Generator) =
-  drawHead(generator, skin.read(), 185, 117)
-  if showFolds.read() then generator.pages(0).draw(folds, 0, 0)
-  generator
+def change(generator: Generator): Unit =
+  skin.read().map { skinImage =>
+    drawHead(generator, skinImage, 185, 117)
+    if showFolds.read() then generator.pages(0).draw(folds, 0, 0)
+  }
 
 def drawHead(generator: Generator, skin: Texture, x: Int, y: Int) =
   def drawRect(src: (Int, Int, Int, Int), dst: (Int, Int, Int, Int), flip: Boolean) =
@@ -47,7 +48,7 @@ def drawHead(generator: Generator, skin: Texture, x: Int, y: Int) =
 
   generator
 
-@JSExportTopLevel("exampleGenerator") val example = Generator(
+@JSExportTopLevel("exampleGenerator") val generator: Generator = Generator(
   id = "example",
   name = "Example Generator",
   thumbnail = (),

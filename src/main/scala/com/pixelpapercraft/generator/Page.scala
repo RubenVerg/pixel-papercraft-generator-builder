@@ -3,7 +3,7 @@ package com.pixelpapercraft.generator
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("Page")
-case class Page():
+case class Page(generator: Generator, idx: Int):
   /**
    * Draws an image at the given origin
    * @param x x coordinate of where the image's origin will end up
@@ -11,4 +11,4 @@ case class Page():
    */
   @JSExport
   def draw(image: Image, x: Int, y: Int) =
-    sys.process.stderr.println(s"Draw $image at ($x, $y)")
+    generator.drawListener(this, image, x, y)
