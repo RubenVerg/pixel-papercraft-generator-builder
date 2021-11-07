@@ -4,7 +4,7 @@ package render
 import scalatags.JsDom.all.*
 
 import scala.scalajs.js.{Date, undefined}
-import org.scalajs.dom.{Blob, BlobPropertyBag, FileReader, HTMLInputElement, window}
+import org.scalajs.dom.{Blob, BlobPropertyBag, FileReader, HTMLInputElement, HTMLSelectElement, window}
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -58,4 +58,23 @@ object RenderInputs:
     val btn = button(id := bid)(lbl).render
     btn.addEventListener("click", evt => cb())
     window.document.body.appendChild(div(btn).render)
+    bid
+
+  def createSelect(lbl: String, opts: Seq[String]) =
+    val bid = mkid("select")
+    window.document.body.appendChild(div(
+      select(id := bid)(opts.map { opt =>
+        option(value := opt)(opt)
+      })
+    ).render)
+    bid
+
+  def getSelect(id: String) =
+    window.document.querySelector(s"#$id").asInstanceOf[HTMLSelectElement].value
+
+  def createText(text: String) =
+    val bid = mkid("text")
+    window.document.body.appendChild(div(
+      p(id := bid)(text)
+    ).render)
     bid
