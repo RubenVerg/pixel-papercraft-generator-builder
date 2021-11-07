@@ -11,8 +11,8 @@ object BarebonesRenderer:
     window.document.body.innerHTML = ""
     window.document.body.appendChild(window.document.createElement("hr"))
     val canvases = generator.pages.map(page => window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement])
-    canvases.foreach { _.width = 595 }
-    canvases.foreach { _.height = 842 }
+    canvases.foreach { _.width = Page.Sizes.A4.px.width }
+    canvases.foreach { _.height = Page.Sizes.A4.px.height }
     val gen = generator.copy(drawListener = (page, image, x, y) => {
       Canvas.drawImage(canvases(page.idx), image, x, y)
     }, change = g => {
@@ -21,7 +21,12 @@ object BarebonesRenderer:
         ctx.clearRect(0, 0, canv.width, canv.height)
       }
       generator.runSetup(g)
-      generator.onChange(g)
+      try { generator.onChange(g) } catch {
+        case ex: Throwable => sys.process.stderr.println(s"Exception thrown `onChange`! $ex")
+      }
     })
     gen.runSetup(gen)
+    try { gen.onChange(gen) } catch {
+      case _: Throwable => ()
+    }
     canvases.foreach { window.document.body.appendChild(_) }

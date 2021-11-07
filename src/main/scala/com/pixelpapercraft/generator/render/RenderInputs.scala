@@ -52,3 +52,10 @@ object RenderInputs:
       reader.addEventListener("loadend", event => promise.success(reader.result.asInstanceOf[String]))
       reader.readAsDataURL(file)
       promise.future
+
+  def createButton(lbl: String, cb: () => Unit) =
+    val bid = mkid("button")
+    val btn = button(id := bid)(lbl).render
+    btn.addEventListener("click", evt => cb())
+    window.document.body.appendChild(div(btn).render)
+    bid

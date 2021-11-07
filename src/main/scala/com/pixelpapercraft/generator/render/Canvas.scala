@@ -67,6 +67,31 @@ object Canvas:
             tempCtx.scale(1, -1)
             tempCtx.drawImage(tempCanvas, 0, -tempCanvas.height)
             tempCtx.restore()
+          case Transformation.ScaleToSize(w, h, alg) => willChangeCanvas {
+            alg match {
+              case ScaleAlgorithm.NearestNeighbor => scaleNearestNeighbor(tempCanvas, w.toDouble / tempCanvas.width, h.toDouble / tempCanvas.height)
+              case ScaleAlgorithm.Classic => scaleClassic(tempCanvas, w.toDouble / tempCanvas.width, h.toDouble / tempCanvas.height)
+            }
+          }
+          case Transformation.Blend(r, g, b) => willChangeCanvas {
+            val transformationCanvas = window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement]
+            val transformationCtx = transformationCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+            val imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height)
+            val newImageData = transformationCtx.createImageData(imageData.width, imageData.height)
+            for {
+              i <- 0 until imageData.data.length by 4
+              red = (imageData.data(i) * r / 255d).toInt
+              green = (imageData.data(i + 1) * g / 255d).toInt
+              blue = (imageData.data(i + 2) * b / 255d).toInt
+              alpha = imageData.data(i + 3)
+            } do
+              newImageData.data(i) = red
+              newImageData.data(i + 1) = green
+              newImageData.data(i + 2) = blue
+              newImageData.data(i + 3) = alpha
+            transformationCtx.putImageData(newImageData, 0, 0)
+            transformationCanvas
+          }
         }
       canvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D].drawImage(tempCanvas, originX, originY)
       // window.document.body.removeChild(tempCanvas)

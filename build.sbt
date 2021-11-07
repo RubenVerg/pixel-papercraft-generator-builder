@@ -6,7 +6,11 @@ organization := "com.pixelpapercraft"
 version := "1.0.0-alpha.1"
 
 scalaVersion := "3.1.0"
-scalacOptions ++= "-feature -deprecation".split(" ").toSeq
+scalacOptions ++= Seq(
+  "-feature",
+  "-deprecation",
+  "-Werror"
+)
 
 libraryDependencies ++= Seq(
   // "org.scala-js" %%% "scalajs-dom" % "2.0.0",
@@ -18,3 +22,20 @@ scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
 
 Test / scalaJSUseTestModuleInitializer := false
 Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
+
+// https://alexn.org/blog/2020/05/26/scala-fatal-warnings.html
+
+val filterConsoleScalacOptions = { options: Seq[String] =>
+  options.filterNot(Set(
+    "-Xfatal-warnings",
+    "-Werror",
+    "-Wdead-code",
+    "-Wunused:imports",
+    "-Ywarn-unused:imports",
+    "-Ywarn-unused-import",
+    "-Ywarn-dead-code",
+  ))
+}
+
+console / scalacOptions ~= filterConsoleScalacOptions
+Test / console / scalacOptions ~= filterConsoleScalacOptions

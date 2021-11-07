@@ -50,6 +50,10 @@ case class Image(
   @JSExport
   def scale(factorX: Double, factorY: Double, algorithm: ScaleAlgorithm = ScaleAlgorithm.NearestNeighbor) =
     transform(Scale(factorX, factorY, algorithm))
+    
+  @JSExport
+  def scaleTo(width: Int, height: Int, algorithm: ScaleAlgorithm = ScaleAlgorithm.NearestNeighbor) =
+    transform(ScaleToSize(width, height, algorithm))
 
   /**
    * Flip the image on the x axis
@@ -62,6 +66,13 @@ case class Image(
    */
   @JSExport
   def flipHorizontal = transform(HorizontalFlip)
+
+  /**
+   * Blends the image with a layer of the provided RGB color
+   * @usecase This works the same way Minecraft colorizes grayscale textures, so getting colors from there should give you correct results
+   */
+  @JSExport
+  def blend(r: Int, g: Int, b: Int) = transform(Blend(r, g, b))
 
 object Image:
   // cannot be @JSExport'ed due to implementation details
@@ -90,6 +101,11 @@ object Image:
     case Scale(factorX: Double, factorY: Double, algorithm: ScaleAlgorithm)
 
     /**
+     * Scale the image to be `width`*`height`
+     */
+    case ScaleToSize(width: Int, height: Int, algorithm: ScaleAlgorithm)
+
+    /**
      * Flip the image vertically
      */
     case VerticalFlip
@@ -98,6 +114,11 @@ object Image:
      * Flip the image horizontally
      */
     case HorizontalFlip
+
+    /**
+     * Multiplies the image with a layer of the required color
+     */
+    case Blend(r: Int, g: Int, b: Int)
 
   enum ScaleAlgorithm:
     case NearestNeighbor

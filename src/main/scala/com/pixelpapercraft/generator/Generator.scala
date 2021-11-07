@@ -18,7 +18,7 @@ case class Generator private[generator] (
                       @JSExport inputs: Seq[input.Input[?]],
                       private[generator] drawListener: (Page, Image, Int, Int) => Unit
                     ):
-  @JSExport val pages = Seq.fill(pageAmount)(0).zipWithIndex.map((_, idx) => Page(this, idx))
+  @JSExport val pages: Seq[Page] = Seq.fill(pageAmount)(0).zipWithIndex.map((_, idx) => Page(this, idx))
 
   @JSExport def runSetup(generator: Generator) =
     for (input <- inputs) do
