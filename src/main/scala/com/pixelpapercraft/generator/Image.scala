@@ -1,5 +1,7 @@
 package com.pixelpapercraft.generator
 
+
+import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 type Point = (Int, Int)
@@ -10,7 +12,7 @@ case class Image(
                   @JSExport url: String,
                   @JSExport transformations: Seq[Image.Transformation] = Seq.empty[Image.Transformation]
                 ):
-  import Image.Transformation, Transformation.*
+  import Image.*, Transformation.*
 
   @JSExport
   def transform(transformation: Transformation) =
@@ -46,7 +48,8 @@ case class Image(
    * Scale the image by a factor of `factorX`*`factorY`
    */
   @JSExport
-  def scale(factorX: Double, factorY: Double) = transform(Scale(factorX, factorY))
+  def scale(factorX: Double, factorY: Double, algorithm: ScaleAlgorithm = ScaleAlgorithm.NearestNeighbor) =
+    transform(Scale(factorX, factorY, algorithm))
 
   /**
    * Flip the image on the x axis
@@ -84,7 +87,7 @@ object Image:
      * @example Scale(0.5, 0.5) // scales the image to be half the size
      *          Scale(2, 3)   // scales the image to be twice the width and three times the height
      */
-    case Scale(factorX: Double, factorY: Double)
+    case Scale(factorX: Double, factorY: Double, algorithm: ScaleAlgorithm)
 
     /**
      * Flip the image vertically
@@ -95,3 +98,14 @@ object Image:
      * Flip the image horizontally
      */
     case HorizontalFlip
+
+  enum ScaleAlgorithm:
+    case NearestNeighbor
+    case Classic
+
+  @JSExportTopLevel("ScaleAlgorithm") val __js_ScaleAlgorithm = new {
+    @JSExport
+    val NearestNeighbor = ScaleAlgorithm.NearestNeighbor
+    @JSExport
+    val Classic = ScaleAlgorithm.Classic
+  }

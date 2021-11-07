@@ -24,6 +24,13 @@ def change(generator: Generator): Unit =
 
 def drawHead(generator: Generator, skin: Texture, x: Int, y: Int) =
   def drawRect(src: (Int, Int, Int, Int), dst: (Int, Int, Int, Int), flip: Boolean) =
+    println(
+      s"""
+         |Drawing section (${src._1}, ${src._2}) thru (${src._1 + src._3}, ${src._2 + src._4})
+         |at (${dst._1}, ${dst._2}) thru (${dst._1 + dst._3}, ${dst._2 + dst._4})
+         |scale: X*${dst._3.toDouble / src._3}, Y*${dst._4.toDouble / src._4}
+         |${if flip then "" else "not "}flipped
+         |""".stripMargin)
     generator.pages(0).draw(skin
       .crop(src._1, src._2, src._1 + src._3, src._2 + src._4)
       .scale(dst._3.toDouble / src._3, dst._4.toDouble / src._4)
