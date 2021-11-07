@@ -15,6 +15,13 @@ object BarebonesRenderer:
     canvases.foreach { _.height = 842 }
     val gen = generator.copy(drawListener = (page, image, x, y) => {
       Canvas.drawImage(canvases(page.idx), image, x, y)
+    }, change = g => {
+      canvases.foreach { canv =>
+        val ctx = canv.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+        ctx.clearRect(0, 0, canv.width, canv.height)
+      }
+      generator.runSetup(g)
+      generator.onChange(g)
     })
     gen.runSetup(gen)
     canvases.foreach { window.document.body.appendChild(_) }
