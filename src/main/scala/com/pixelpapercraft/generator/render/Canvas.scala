@@ -115,14 +115,15 @@ object Canvas:
     transformCanvas.height = (canvas.height * factorY).toInt
     val ctx = transformCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
     for {
-      x <- 0 until data.width
-      y <- 0 until data.height
-      cellIdx = (y * data.width + x * 4)
-      red = data.data(cellIdx)
-      green = data.data(cellIdx + 1)
-      blue = data.data(cellIdx + 2)
-      alpha = data.data(cellIdx + 3)
+      x <- 0 until canvas.width
+      y <- 0 until canvas.height
+      cellId = data.width * y + x
+      red = data.data(cellId * 4 + 0)
+      green = data.data(cellId * 4 + 1)
+      blue = data.data(cellId * 4 + 2)
+      alpha = data.data(cellId * 4 + 3)
     } do
+      // println(s"Drawing $factorX * $factorY rect at $x, $y")
       ctx.fillStyle = s"rgba($red, $green, $blue, ${alpha / 255})"
       ctx.fillRect(x * factorX, y * factorY, factorX, factorY)
     transformCanvas

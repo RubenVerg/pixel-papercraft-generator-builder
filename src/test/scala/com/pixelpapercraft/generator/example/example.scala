@@ -35,7 +35,7 @@ def drawHead(generator: Generator, skin: Texture, x: Int, y: Int) =
       .crop(src._1, src._2, src._1 + src._3, src._2 + src._4)
       .scale(dst._3.toDouble / src._3, dst._4.toDouble / src._4)
       .runIf(flip)(img => img.flipVertical),
-      src._1, src._2)
+      dst._1, dst._2)
 
   // Head Base
   drawRect((0, 8, 8, 8), (x - 64, y + 0, 64, 64), false) // Right
