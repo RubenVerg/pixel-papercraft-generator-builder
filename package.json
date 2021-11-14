@@ -4,7 +4,7 @@
   "description": "Papercraft generator builder for Pixel Papercraft",
   "author": "Pixel Papercraft",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "start": "webpack serve",
     "build": "NODE_ENV=production webpack",
