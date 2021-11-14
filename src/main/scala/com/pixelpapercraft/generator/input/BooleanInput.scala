@@ -8,13 +8,13 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("BooleanInput")
 case class BooleanInput(label: String, default: Boolean)
   extends Input[Boolean](label):
-  var id: Option[String] = None
+  val id = MutableItemBox(Option.empty[String])
 
   @JSExport
   override def create() =
-    if (id.isEmpty)
-      id = Some(RenderInputs.createBoolean(label, default))
-    id.get
+    if (id().isEmpty)
+      id() = Some(RenderInputs.createBoolean(label, default))
+    id().get
 
   @JSExport
-  override def read(): Boolean = id.map(RenderInputs.getBoolean).getOrElse(default)
+  override def read(): Boolean = id().map(RenderInputs.getBoolean).getOrElse(default)

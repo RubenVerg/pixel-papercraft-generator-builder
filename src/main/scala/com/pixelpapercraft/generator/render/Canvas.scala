@@ -78,13 +78,13 @@ object Canvas:
             val transformationCtx = transformationCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
             val imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height)
             val newImageData = transformationCtx.createImageData(imageData.width, imageData.height)
-            for {
+            for
               i <- 0 until imageData.data.length by 4
               red = (imageData.data(i) * r / 255d).toInt
               green = (imageData.data(i + 1) * g / 255d).toInt
               blue = (imageData.data(i + 2) * b / 255d).toInt
               alpha = imageData.data(i + 3)
-            } do
+            do
               newImageData.data(i) = red
               newImageData.data(i + 1) = green
               newImageData.data(i + 2) = blue
@@ -114,7 +114,7 @@ object Canvas:
     transformCanvas.width = (canvas.width * factorX).toInt
     transformCanvas.height = (canvas.height * factorY).toInt
     val ctx = transformCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-    for {
+    for
       x <- 0 until canvas.width
       y <- 0 until canvas.height
       cellId = data.width * y + x
@@ -122,7 +122,7 @@ object Canvas:
       green = data.data(cellId * 4 + 1)
       blue = data.data(cellId * 4 + 2)
       alpha = data.data(cellId * 4 + 3)
-    } do
+    do
       // println(s"Drawing $factorX * $factorY rect at $x, $y")
       ctx.fillStyle = s"rgba($red, $green, $blue, ${alpha / 255})"
       ctx.fillRect(x * factorX, y * factorY, factorX, factorY)

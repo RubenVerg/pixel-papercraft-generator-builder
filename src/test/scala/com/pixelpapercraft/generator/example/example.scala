@@ -2,7 +2,9 @@ package com.pixelpapercraft.generator
 package example
 
 import concurrent.ExecutionContext.Implicits.global
-import scala.scalajs.js.annotation.JSExportTopLevel
+import scalajs.js
+import js.annotation.JSExportTopLevel
+import js.JSConverters.*
 
 extension[A](a: A)
   def runIf[B >: A](cond: => Boolean)(f: A => B): B = if cond then f(a) else a
@@ -64,5 +66,5 @@ def drawHead(generator: Generator, skin: Texture, x: Int, y: Int) =
   pageAmount = 1,
   setup = setup,
   change = change,
-  inputs = Seq(skin, showFolds)
+  inputs = Seq(skin, showFolds)//.toJSArray
 )

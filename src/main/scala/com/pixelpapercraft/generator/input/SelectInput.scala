@@ -1,19 +1,23 @@
-package com.pixelpapercraft.generator.input
+package com.pixelpapercraft.generator
+package input
 
 import com.pixelpapercraft.generator.render.RenderInputs
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scalajs.js
 
 @JSExportTopLevel("SelectInput")
-case class SelectInput[A <: String](label: String, options: Seq[A])
-  extends Input[A](label):
-  var id: Option[String] = None
+case class SelectInput(label: String, options: js.Array[String])
+  extends Input[String](label):
+  def this(label: String, opts: Seq[String]) = this(label, js.Array(opts*))
+
+  val id = MutableItemBox(Option.empty[String])
 
   @JSExport
   override def create(): String =
-    if id.isEmpty then
-      id = Some(RenderInputs.createSelect(label, options))
-    id.get
+    if id().isEmpty then
+      id() = Some(RenderInputs.createSelect(label, options.toSeq))
+    id().get
   
   @JSExport
-  override def read(): A = id.map(RenderInputs.getSelect(_).asInstanceOf[A]).get
+  override def read() = id().map(RenderInputs.getSelect(_)).get

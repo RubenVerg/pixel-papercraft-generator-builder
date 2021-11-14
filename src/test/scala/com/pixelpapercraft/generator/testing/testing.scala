@@ -4,6 +4,8 @@ package testing
 import com.pixelpapercraft.generator.Image.ScaleAlgorithm
 import com.pixelpapercraft.generator.input.ButtonInput
 
+import scalajs.js
+import js.JSConverters.*
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 val grid = Image(Base64Images.grid)
@@ -24,12 +26,13 @@ object Config {
 
 def drawGrid(generator: Generator, page: Int) =
   println(s"Drawing grid in page $page")
-  for {
+  for
     x <- 0 until Config.colCount
     y <- 0 until Config.colCount
     xPos = Config.offsetX + x * Config.gridCellSize
     yPos = Config.offsetY + y * Config.gridCellSize
-  } generator.pages(page).draw(grid, xPos, yPos)
+  do
+    generator.pages(page).draw(grid, xPos, yPos)
 
 def drawPage4(generator: Generator) =
   println("Drawing page 4")
@@ -66,19 +69,20 @@ def drawPage4(generator: Generator) =
     (red, green, blue)
   }
 
-  for {
+  for
     row <- 0 until Config.rowCount
     col <- 0 until Config.colCount
     x = Config.offsetX + Config.gridCellSize * col + indent
     y = Config.offsetY + Config.gridCellSize * row + indent
     index = col + row * Config.colCount
-  } tints.lift(index) match {
-    case None =>
-      page.draw(steve.crop(8, 8, 16, 16).scaleTo(size, size), x, y)
-      page.draw(grassSide.scaleTo(size, size).blend(89, 201, 60), x, y)
-    case Some(tint) =>
-      page.draw(grassTop.scaleTo(size, size).blend(tint._1, tint._2, tint._3), x, y)
-  }
+  do
+    tints.lift(index) match {
+      case None =>
+        page.draw(steve.crop(8, 8, 16, 16).scaleTo(size, size), x, y)
+        page.draw(grassSide.scaleTo(size, size).blend(89, 201, 60), x, y)
+      case Some(tint) =>
+        page.draw(grassTop.scaleTo(size, size).blend(tint._1, tint._2, tint._3), x, y)
+    }
 
 def drawPage5(generator: Generator) =
   drawGrid(generator, 4)
@@ -116,7 +120,7 @@ def drawPage5(generator: Generator) =
     (8, 8, 8, 8, 1, 1, true)
   )
 
-  for {
+  for
     row <- 0 until Config.rowCount
     col <- 0 until Config.colCount
     x = Config.offsetX + Config.gridCellSize * col + indent
@@ -125,7 +129,8 @@ def drawPage5(generator: Generator) =
     if index < tests.length
     (sx, sy, sw, sh, dw, dh, pixelate) = tests(index)
     // TODO pixelate!
-  } page.draw(steve.crop(sx, sy, sx + sw, sy + sh).scaleTo(dw, dh), x, y)
+  do
+    page.draw(steve.crop(sx, sy, sx + sw, sy + sh).scaleTo(dw, dh), x, y)
 
 def drawPage(generator: Generator, pageIndex: Int, image: Image) =
   drawGrid(generator, pageIndex)
@@ -159,13 +164,14 @@ def drawPage(generator: Generator, pageIndex: Int, image: Image) =
     (3, 4) -> (180, -1),
   )
 
-  for {
+  for
     ((x, y), (angle, flipMode)) <- things
-  } page.draw(
-    image.scaleTo(Config.gridCellSize / 2, Config.gridCellSize / 2),
-    Config.offsetX + x * Config.gridCellSize + Config.gridCellSize / 4,
-    Config.offsetY + y * Config.gridCellSize + Config.gridCellSize / 4
-  )
+  do
+    page.draw(
+      image.scaleTo(Config.gridCellSize / 2, Config.gridCellSize / 2),
+      Config.offsetX + x * Config.gridCellSize + Config.gridCellSize / 4,
+      Config.offsetY + y * Config.gridCellSize + Config.gridCellSize / 4
+    )
 
 val button = ButtonInput("Example Button Input") { () =>
   println("Hello")
@@ -193,5 +199,5 @@ def change(generator: Generator) =
   pageAmount = 5,
   setup = setup,
   change = change,
-  inputs = Seq(button)
+  inputs = Seq(button)//.toJSArray
 )
