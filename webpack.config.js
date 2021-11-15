@@ -1,5 +1,6 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const port = process.env.PORT || 3000;
 
@@ -7,10 +8,12 @@ let isProduction = process.env.NODE_ENV === "production";
 const mode = isProduction ? "production" : "development";
 const devtool = isProduction ? "source-map" : "inline-source-map";
 
-module.exports = {
+const __dirname = fileURLToPath(path.dirname(import.meta.url));
+
+export default {
   mode,
-  entry: "./src/index.bs.js",
-  devtool: devtool,
+  entry: "./src/test/js/index.js",
+  devtool,
   devServer: {
     static: "./dist",
     port,
@@ -26,7 +29,12 @@ module.exports = {
       {
         test: /\.(js)$/,
         exclude: /node_modules/,
-        use: ["babel-loader"],
+        use: [{
+          loader: "babel-loader",
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }]
       },
       {
         test: /\.png|\.jpg|\.jpeg/,
@@ -37,5 +45,10 @@ module.exports = {
         use: ["style-loader", "css-loader", "postcss-loader"],
       },
     ],
+  },
+  resolve: {
+    alias: {
+      'generator-builder': path.resolve(__dirname, `./target/scala-3.1.0/generator-builder${isProduction ? "-test-opt" : "-test-fastopt"}/main.js`)
+    },
   },
 };
