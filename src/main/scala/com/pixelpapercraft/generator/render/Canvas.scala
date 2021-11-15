@@ -54,9 +54,18 @@ object Canvas:
             )
             transformCanvas
           }
-          case Transformation.Rotate(_, _) =>
-            // TODO rotations, gotta calculate how much to have the canvas be long and stuff
-            sys.process.stderr.println("ROTATION NOT SUPPORTED yet")
+          case Transformation.RotateAroundCenter(degrees) =>
+            tempCtx.save()
+            tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2)
+            tempCtx.rotate(math.toRadians(degrees))
+            tempCtx.translate(-tempCanvas.width / 2, -tempCanvas.height / 2)
+            tempCtx.restore()
+          case Transformation.Rotate(degrees, (x, y)) =>
+            tempCtx.save()
+            tempCtx.translate(x, y)
+            tempCtx.rotate(math.toRadians(degrees))
+            tempCtx.translate(-x, -y)
+            tempCtx.restore()
           case Transformation.HorizontalFlip =>
             tempCtx.save()
             tempCtx.scale(-1, 1)

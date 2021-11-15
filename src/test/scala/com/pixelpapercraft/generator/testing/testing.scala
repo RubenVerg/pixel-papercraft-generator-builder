@@ -184,8 +184,34 @@ def change(generator: Generator) =
   drawPage(generator, 1, steve256.crop(32, 32, 64, 64))
 
   drawGrid(generator, 2)
+  val sw = 8
+  val sh = 3
+  val scale = 8
+  val dw = sw * scale
+  val dh = sh * scale
+  val src = (8, 11, sw, sh)
+  def dst(gridX: Int, gridY: Int) = (
+    Config.offsetX + gridX * Config.gridCellSize + Config.gridCellSize / 2 - dw / 2,
+    Config.offsetY + gridY * Config.gridCellSize + Config.gridCellSize / 2 - dh / 2,
+    dw, dh
+  )
+  val rows = 6
+  val cols = 4
+  val deg = 360d / (rows * cols)
 
-  // TODO rotation stuff, too lazy to copy over :)
+  for
+    row <- 0 until rows
+    col <- 0 until cols
+    factor = row * cols + col
+    rotate = deg * factor
+    dest = dst(col, row)
+  do
+    generator.pages(2).draw(steve
+      .crop(src._1, src._2, src._1 + src._3, src._2 + src._4)
+      .scaleTo(dest._3, dest._4)
+      .rotate(rotate, "center"),
+      dest._1, dest._2
+    )
 
   drawPage4(generator)
   drawPage5(generator)

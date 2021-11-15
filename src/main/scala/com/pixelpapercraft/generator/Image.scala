@@ -33,7 +33,10 @@ case class Image(
    * @param angle Angle in degrees, counterclockwise, of rotation
    */
   @JSExport
-  def rotate(angle: Double) = transform(Rotate(angle, (0, 0)))
+  def rotate(angle: Double, origin: "top left" | "center") = transform(origin match {
+    case "top left" => Rotate(angle, (0, 0))
+    case "center" => RotateAroundCenter(angle)
+  })
 
   /**
    * Rotate the image around the given rotational origin
@@ -92,6 +95,11 @@ object Image:
      * Rotate the image `angle` degrees (full turn = 360) counterclockwise, using `origin` as the rotation origin
      */
     case Rotate(angle: Double, origin: Point)
+
+    /**
+     * Same as `Rotate`, except around the center
+     */
+    case RotateAroundCenter(angle: Double)
 
     /**
      * Scale the image with the `factor`s
