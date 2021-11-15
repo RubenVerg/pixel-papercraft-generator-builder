@@ -1,8 +1,9 @@
 import * as builder from 'generator-builder'
 
-import background from './images/Background.png';
-import folds from './images/Folds.png';
-import steve from './images/Skin.png';
+import backgroundImage from './images/Background.png';
+import foldsImage from './images/Folds.png';
+
+const background = builder.Image(backgroundImage), folds = builder.Image(foldsImage)
 
 const showFolds = builder.BooleanInput("Show Folds", true)
 const skin = builder.TextureInput("Skin", 64, 64, [builder.Texture()])
@@ -12,7 +13,7 @@ function setup(generator) {
 }
 
 function change(generator) {
-  skin.read().map(img => {
+  skin.read().then(img => {
     drawHead(generator, img, 185, 117);
     if (showFolds.read())
       generator.pages[0].draw(folds, 0, 0);
@@ -24,7 +25,7 @@ function drawHead(generator, skin, x, y) {
     const img = skin
       .crop(src1, src2, src1 + src3, src2 + src4)
       .scale(dst3 / src3, dst4 / src4)
-    generator.pages[0].draw(flip ? skin.flipVertical : skin, dst1, dst2)
+    generator.pages[0].draw(flip ? img.flipVertical : img, dst1, dst2)
   }
 
   drawRect(0, 8, 8, 8, x - 64, y + 0, 64, 64, false) // Right

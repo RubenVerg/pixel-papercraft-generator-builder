@@ -58,8 +58,8 @@ def drawHead(generator: Generator, skin: Texture, x: Int, y: Int) =
   generator
 
 @JSExportTopLevel("exampleGenerator") val generator: Generator = Generator(
-  id = "example",
-  name = "Example Generator",
+  id = "exampleScala",
+  name = "Example Generator (Scala)",
   thumbnail = (),
   video = (),
   instructions = "",

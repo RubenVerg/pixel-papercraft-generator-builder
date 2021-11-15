@@ -2,11 +2,12 @@ package com.pixelpapercraft.generator
 package input
 
 import concurrent.ExecutionContext.Implicits.global
-
 import com.pixelpapercraft.generator.render.RenderInputs
 
 import scala.concurrent.Future
+import scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.util.{Failure, Success}
 
 /**
  * An input for a Minecraft texture
@@ -18,8 +19,9 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
  */
 
 @JSExportTopLevel("TextureInput")
-case class TextureInput(label: String, width: Int, height: Int, choices: Seq[Texture])
+case class TextureInput(label: String, width: Int, height: Int, choices: js.Array[Texture])
   extends Input[Future[Texture]](label):
+
   val id = MutableItemBox(Option.empty[String])
 
   @JSExport
@@ -28,6 +30,17 @@ case class TextureInput(label: String, width: Int, height: Int, choices: Seq[Tex
       id() = Some(RenderInputs.createImage(label/*, choices*/))
     id().get
 
-  @JSExport
   override def read() =
     id().map(RenderInputs.getImage).getOrElse(Future.successful("data:image/png;base64,")).map(Texture(_))
+
+  @JSExport("read")
+  def readJS() = js.Promise[Texture]{ (resolve, reject) =>
+    read().andThen { result => result match {
+      case Success(value) => resolve(value)
+      case Failure(exception) => reject(exception)
+    }}
+  }
+
+object TextureInput:
+  def apply(label: String, width: Int, height: Int, choices: Seq[Texture]): TextureInput =
+    TextureInput(label, width, height, js.Array(choices*))
