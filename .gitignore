@@ -8,3 +8,4 @@
 *.bs.js
 /target
 /generators/target
+/generators/src/main/ts-out

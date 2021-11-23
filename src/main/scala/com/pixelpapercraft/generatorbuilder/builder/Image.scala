@@ -28,8 +28,9 @@ case class Image(
   def crop(startX: Int, startY: Int, endX: Int, endY: Int) = transform(Crop((startX, startY), (endX, endY)))
 
   /**
-   * Rotate the image around the (0, 0) origin point
+   * Rotate the image around the chosen origin point
    * @param angle Angle in degrees, counterclockwise, of rotation
+   * @param origin Whether the origin should be (0, 0) or the image center
    */
   @JSExport
   def rotate(angle: Double, origin: "top left" | "center") = transform(origin match {

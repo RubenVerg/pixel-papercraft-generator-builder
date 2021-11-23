@@ -7,7 +7,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalajs.js
 
 @JSExportTopLevel("ButtonInput")
-case class ButtonInput(label: String)(callback: js.Function0[Unit])
+case class ButtonInput(label: String, callback: js.Function0[Unit])
   extends Input[Unit](label):
   val id = MutableItemBox(Option.empty[String])
   
@@ -19,3 +19,6 @@ case class ButtonInput(label: String)(callback: js.Function0[Unit])
   
   @JSExport
   override def read(): Unit = ()
+
+object ButtonInput:
+  def apply(label: String)(callback: () => Unit): ButtonInput = ButtonInput(label, callback)

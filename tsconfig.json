@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "rootDir": "generators/src/main/ts",
+    "outDir": "generators/src/main/ts-out",
+    "allowJs": true,
+    "checkJs": false,
+    "incremental": true,
+    "strict": true
+  },
+  "include": [
+    "generators/src/main/ts/**/*"
+  ]
+}
