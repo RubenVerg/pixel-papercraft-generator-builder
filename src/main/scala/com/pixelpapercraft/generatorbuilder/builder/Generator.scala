@@ -1,6 +1,6 @@
-package com.pixelpapercraft.generator
+package com.pixelpapercraft.generatorbuilder.builder
 
-import com.pixelpapercraft.generator.render.RenderInputs
+import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalajs.js
@@ -21,7 +21,7 @@ case class Generator (
                       @JSExport inputs: js.Array[input.Input[?]]
                     ):
 
-  private[generator] var drawListener: (Page, Image, Int, Int) => Unit =
+  private[builder] var drawListener: (Page, Image, Int, Int) => Unit =
     (_: Page, _: Image, _: Int, _: Int) => println("if you see this, there's a bug somewhere")
 
   @JSExport val pages: js.Array[Page] = js.Array(Seq.fill(pageAmount)(0).zipWithIndex.map((_, idx) => Page(this, idx))*)

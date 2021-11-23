@@ -12,7 +12,7 @@ const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
 export default {
   mode,
-  entry: "./src/test/js/index.js",
+  entry: "./generators/src/main/js/index.js",
   devtool,
   devServer: {
     static: "./dist",
@@ -48,7 +48,7 @@ export default {
   },
   resolve: {
     alias: {
-      'generator-builder': path.resolve(__dirname, `./target/scala-3.1.0/generator-builder${isProduction ? "-test-opt" : "-test-fastopt"}/main.js`)
+      'generator-builder': path.resolve(__dirname, `./generators/target/scala-3.1.0/generators-${isProduction ? "opt" : "fastopt"}/main.js`)
     },
   },
 };

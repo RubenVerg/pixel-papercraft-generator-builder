@@ -1,4 +1,4 @@
-package com.pixelpapercraft.generator.input
+package com.pixelpapercraft.generatorbuilder.builder.input
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 

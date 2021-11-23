@@ -1,7 +1,7 @@
-package com.pixelpapercraft.generator
-package render
+package com.pixelpapercraft.generatorbuilder.builder.render
 
-import com.pixelpapercraft.generator.Image.{Transformation, ScaleAlgorithm}
+import com.pixelpapercraft.generatorbuilder.builder.Image
+import com.pixelpapercraft.generatorbuilder.builder.Image.{ScaleAlgorithm, Transformation}
 import org.scalajs.dom.{CanvasRenderingContext2D, HTMLCanvasElement, HTMLImageElement, window}
 
 import scala.concurrent.Promise

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder.iml" filepath="$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/generators.iml" filepath="$PROJECT_DIR$/.idea/modules/generators.iml" />
     </modules>
   </component>
 </project>

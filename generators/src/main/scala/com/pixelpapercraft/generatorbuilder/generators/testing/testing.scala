@@ -1,8 +1,9 @@
-package com.pixelpapercraft.generator
-package testing
+package com.pixelpapercraft.generatorbuilder
+package generators.testing
 
-import com.pixelpapercraft.generator.Image.ScaleAlgorithm
-import com.pixelpapercraft.generator.input.ButtonInput
+import builder.*
+import Image.ScaleAlgorithm
+import input.ButtonInput
 
 import scalajs.js
 import js.JSConverters.*
@@ -14,7 +15,7 @@ val steve256 = Texture(Base64Images.steve256)
 val grassSide = Texture(Base64Images.grassSide)
 val grassTop = Texture(Base64Images.grassTop)
 
-object Config {
+object Config:
   val colCount = 4
   val rowCount = 6
   val gridCellSize = 128
@@ -22,7 +23,6 @@ object Config {
   val gridHeight = rowCount * gridCellSize
   val offsetX = (Page.Sizes.A4.px.width - gridWidth) / 2
   val offsetY = (Page.Sizes.A4.px.height - gridHeight) / 2
-}
 
 def drawGrid(generator: Generator, page: Int) =
   println(s"Drawing grid in page $page")

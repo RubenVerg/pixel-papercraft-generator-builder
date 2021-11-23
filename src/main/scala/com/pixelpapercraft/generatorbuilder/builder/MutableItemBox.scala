@@ -1,4 +1,4 @@
-package com.pixelpapercraft.generator
+package com.pixelpapercraft.generatorbuilder.builder
 
 case class MutableItemBox[A](private var contained: A):
   def apply() = contained

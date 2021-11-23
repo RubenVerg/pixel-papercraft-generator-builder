@@ -1,6 +1,6 @@
-package com.pixelpapercraft.generator
-package render
+package com.pixelpapercraft.generatorbuilder.builder.render
 
+import com.pixelpapercraft.generatorbuilder.builder.Generator
 import scalatags.JsDom.all.*
 
 import scala.scalajs.js.{Date, undefined}

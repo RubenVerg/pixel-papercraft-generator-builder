@@ -1,5 +1,7 @@
-package com.pixelpapercraft.generator
-package example
+package com.pixelpapercraft.generatorbuilder
+package generators.example
+
+import builder.*
 
 import concurrent.ExecutionContext.Implicits.global
 import scalajs.js

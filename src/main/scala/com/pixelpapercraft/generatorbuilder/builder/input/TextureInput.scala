@@ -1,8 +1,9 @@
-package com.pixelpapercraft.generator
-package input
+package com.pixelpapercraft.generatorbuilder.builder.input
+
+import com.pixelpapercraft.generatorbuilder.builder.{MutableItemBox, Texture}
 
 import concurrent.ExecutionContext.Implicits.global
-import com.pixelpapercraft.generator.render.RenderInputs
+import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 
 import scala.concurrent.Future
 import scalajs.js

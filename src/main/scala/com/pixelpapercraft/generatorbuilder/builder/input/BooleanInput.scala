@@ -1,7 +1,7 @@
-package com.pixelpapercraft.generator
-package input
+package com.pixelpapercraft.generatorbuilder.builder.input
 
-import com.pixelpapercraft.generator.render.RenderInputs
+import com.pixelpapercraft.generatorbuilder.builder.MutableItemBox
+import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 

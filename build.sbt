@@ -1,27 +1,45 @@
-lazy val root = project.in(file(".")).enablePlugins(ScalaJSPlugin)
+lazy val builder = project.in(file(".")).enablePlugins(ScalaJSPlugin)
+lazy val generators = project.in(file("generators")).enablePlugins(ScalaJSPlugin).dependsOn(builder)
 
-name := "Pixel Papercraft Generator Builder"
-normalizedName := "generator-builder"
-organization := "com.pixelpapercraft"
-version := "1.0.0-alpha.1"
+builder / name := "Pixel Papercraft Generator Builder"
+builder / normalizedName := "builder"
+generators / name := "Pixel Papercraft Generators"
+generators / normalizedName := "generators"
 
-scalaVersion := "3.1.0"
-scalacOptions ++= Seq(
+val org = "com.pixelpapercraft.generator-builder"
+val v = "1.0.0-alpha.1"
+val scalaV = "3.1.0"
+val scalaOpts = Seq(
   "-feature",
   "-deprecation",
   "-Werror"
 )
 
-libraryDependencies ++= Seq(
+builder / organization := org
+generators / organization := org
+builder / version := v
+generators / version := v
+builder / scalaVersion := scalaV
+generators / scalaVersion := scalaV
+builder / scalacOptions ++= scalaOpts
+generators / scalacOptions ++= scalaOpts
+builder / libraryDependencies ++= Seq(
   // "org.scala-js" %%% "scalajs-dom" % "2.0.0",
   "com.lihaoyi" %%% "scalatags" % "0.10.0" cross CrossVersion.for3Use2_13
 )
+generators / libraryDependencies ++= Seq(
+  "com.lihaoyi" %%% "scalatags" % "0.10.0" cross CrossVersion.for3Use2_13
+)
 
-scalaJSUseMainModuleInitializer := false
-scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
+builder / scalaJSUseMainModuleInitializer := false
+generators / scalaJSUseMainModuleInitializer := false
+builder / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
+generators / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
 
-Test / scalaJSUseTestModuleInitializer := false
-Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
+builder / Test / scalaJSUseTestModuleInitializer := false
+generators / Test / scalaJSUseTestModuleInitializer := false
+builder / Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
+generators / Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) }
 
 // https://alexn.org/blog/2020/05/26/scala-fatal-warnings.html
 
@@ -37,5 +55,7 @@ val filterConsoleScalacOptions = { options: Seq[String] =>
   ))
 }
 
-console / scalacOptions ~= filterConsoleScalacOptions
-Test / console / scalacOptions ~= filterConsoleScalacOptions
+builder / console / scalacOptions ~= filterConsoleScalacOptions
+generators / console / scalacOptions ~= filterConsoleScalacOptions
+builder / Test / console / scalacOptions ~= filterConsoleScalacOptions
+generators / Test / console / scalacOptions ~= filterConsoleScalacOptions
