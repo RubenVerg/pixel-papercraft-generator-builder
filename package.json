@@ -6,10 +6,17 @@
   "license": "ISC",
   "type": "module",
   "scripts": {
-    "start": "webpack serve",
-    "build": "NODE_ENV=production webpack",
-    "res:build": "rescript build",
-    "res:watch": "rescript build -w"
+    "setup:ts": "copyfiles -u 4 generators/src/main/ts/**/* generators/src/main/ts-out",
+    "build:web": "NODE_ENV=production webpack",
+    "build:ts": "npm run setup:ts && tsc",
+    "build:scala": "sbt \"generators / fullLinkJS\"",
+    "build:res": "rescript build",
+    "build": "npm run build:scala && npm run build:ts && npm run build:res && npm run build:web",
+    "start:web": "webpack serve",
+    "start:ts": "npm run setup:ts && concurrently -n copy,tsc \"watch -p 'generators/src/main/ts/**/*' -c 'npm run setup:ts'\" \"tsc --watch\"",
+    "start:scala": "sbt \"~generators / fastLinkJS\"",
+    "start:res": "rescript build -w",
+    "start": "concurrently 'npm:start:*'"
   },
   "devDependencies": {
     "@babel/core": "7.15.5",
@@ -17,6 +24,7 @@
     "@babel/preset-react": "7.14.5",
     "autoprefixer": "10.3.4",
     "babel-loader": "8.2.2",
+    "concurrently": "^6.4.0",
     "copyfiles": "^2.4.1",
     "css-loader": "6.3.0",
     "html-webpack-plugin": "5.3.2",
@@ -27,6 +35,7 @@
     "style-loader": "3.2.1",
     "tailwindcss": "2.2.15",
     "typescript": "^4.5.2",
+    "watch-cli": "^0.2.3",
     "webpack": "5.53.0",
     "webpack-cli": "4.8.0",
     "webpack-dev-server": "4.2.1"

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="pixel-papercraft-generator-builder.Pixel Papercraft Generator Builder">
+      <option name="deprecationWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <parameters>
+        <parameter value="-scalajs" />
+        <parameter value="-Werror" />
+      </parameters>
+    </profile>
+    <profile name="sbt 2" modules="pixel-papercraft-generator-builder.generators">
+      <option name="deprecationWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <parameters>
+        <parameter value="-Werror" />
+        <parameter value="-scalajs" />
+      </parameters>
+    </profile>
+  </component>
+</project>

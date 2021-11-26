@@ -5,6 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder.iml" filepath="$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/Pixel Papercraft Generator Builder-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/generators.iml" filepath="$PROJECT_DIR$/.idea/modules/generators.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/pixel-papercraft-generator-builder.Pixel Papercraft Generator Builder.iml" filepath="$PROJECT_DIR$/.idea/modules/pixel-papercraft-generator-builder.Pixel Papercraft Generator Builder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/pixel-papercraft-generator-builder.generators.iml" filepath="$PROJECT_DIR$/.idea/modules/pixel-papercraft-generator-builder.generators.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/project.Pixel Papercraft Generator Builder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/project.Pixel Papercraft Generator Builder-build.iml" />
     </modules>
   </component>
 </project>
