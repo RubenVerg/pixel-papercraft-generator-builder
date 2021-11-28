@@ -3,20 +3,19 @@ import * as builder from 'generator-builder';
 import backgroundImage from './images/Background.png';
 import foldsImage from './images/Folds.png';
 
-const background = new builder.Image(backgroundImage), folds = new builder.Image(foldsImage)
+const background = builder.loadImage(backgroundImage), folds = builder.loadImage(foldsImage)
 
 const showFolds = new builder.BooleanInput('Show Folds', true)
-const skin = new builder.TextureInput('Skin', 64, 64, [new builder.Texture()])
+const skin = new builder.TextureInput('Skin', 64, 64, [])
 
-const setup = (generator: builder.Generator) => {
-  generator.pages[0].draw(background, 0, 0)
+const setup = async (generator: builder.Generator) => {
+  generator.pages[0].draw(await background, 0, 0)
 }
 
-const change = (generator: builder.Generator) => {
-  skin.read().then(img => {
-    drawHead(generator, img, 185, 117);
-    if (showFolds.read()) generator.pages[0].draw(folds, 0, 0);
-  });
+const change = async (generator: builder.Generator) => {
+  const img = await skin.read();
+  drawHead(generator, img, 185, 117);
+  if (showFolds.read()) generator.pages[0].draw(await folds, 0, 0);
 }
 
 function drawHead(generator: builder.Generator, skin: builder.Image, x: number, y: number) {

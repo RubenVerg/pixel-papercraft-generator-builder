@@ -1,21 +1,24 @@
 package com.pixelpapercraft.generatorbuilder.builder
 
+import render.Canvas
+import org.scalajs.dom
+import dom.html
+
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import js.annotation.{JSExport, JSExportTopLevel}
+import scala.concurrent.Promise
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 type Point = (Int, Int)
 
 // Lazy images, they don't store the data, just an URL and a sequence of transformations
 @JSExportTopLevel("Image")
-case class Image(
-                  @JSExport url: String,
-                  @JSExport transformations: Seq[Image.Transformation] = Seq.empty[Image.Transformation]
-                ):
-  import Image.*, Transformation.*
+case class Image(canvas: html.Canvas):
+  import Image.*
 
-  @JSExport
-  def transform(transformation: Transformation) =
-    this.copy(transformations = this.transformations :+ transformation)
+  def width = canvas.width
+  def height = canvas.height
 
   /**
    * Crop the image
@@ -25,18 +28,8 @@ case class Image(
    * @param endY y coordinate of the bottom-right point
    */
   @JSExport
-  def crop(startX: Int, startY: Int, endX: Int, endY: Int) = transform(Crop((startX, startY), (endX, endY)))
-
-  /**
-   * Rotate the image around the chosen origin point
-   * @param angle Angle in degrees, counterclockwise, of rotation
-   * @param origin Whether the origin should be (0, 0) or the image center
-   */
-  @JSExport
-  def rotate(angle: Double, origin: "top left" | "center") = transform(origin match {
-    case "top left" => Rotate(angle, (0, 0))
-    case "center" => RotateAroundCenter(angle)
-  })
+  def crop(startX: Int, startY: Int, endX: Int, endY: Int) =
+    Image(Canvas.crop(canvas, (startX, startY), (endX, endY)))
 
   /**
    * Rotate the image around the given rotational origin
@@ -45,89 +38,43 @@ case class Image(
    * @param originY y coordinate of the rotational origin
    */
   @JSExport
-  def rotate(angle: Double, originX: Int, originY: Int) = transform(Rotate(angle, (originX, originY)))
+  def rotate(angle: Double, originX: Int = width / 2, originY: Int = height / 2) =
+    Image(Canvas.rotate(canvas, (originX, originY), angle))
 
   /**
    * Scale the image by a factor of `factorX`*`factorY`
    */
   @JSExport
-  def scale(factorX: Double, factorY: Double, algorithm: ScaleAlgorithm = ScaleAlgorithm.NearestNeighbor) =
-    transform(Scale(factorX, factorY, algorithm))
-    
+  def scaleBy(factorX: Double, factorY: Double, algorithm: ScaleAlgorithm = ScaleAlgorithm.NearestNeighbor) =
+    Image(Canvas.scale(canvas, (width * factorX).toInt, (height * factorY).toInt, algorithm))
+
+  /**
+   * Scale the image to be `width` * `height`
+   */
   @JSExport
   def scaleTo(width: Int, height: Int, algorithm: ScaleAlgorithm = ScaleAlgorithm.NearestNeighbor) =
-    transform(ScaleToSize(width, height, algorithm))
+    Image(Canvas.scale(canvas, width, height, algorithm))
 
   /**
    * Flip the image on the x axis
    */
   @JSExport
-  def flipVertical = transform(VerticalFlip)
+  def flipVertical = Image(Canvas.flipVertical(canvas))
 
   /**
    * Flip the image on the y axis
    */
   @JSExport
-  def flipHorizontal = transform(HorizontalFlip)
+  def flipHorizontal = Image(Canvas.flipHorizontal(canvas))
 
   /**
    * Blends the image with a layer of the provided RGB color
    * @usecase This works the same way Minecraft colorizes grayscale textures, so getting colors from there should give you correct results
    */
   @JSExport
-  def blend(r: Int, g: Int, b: Int) = transform(Blend(r, g, b))
+  def blend(r: Int, g: Int, b: Int) = Image(Canvas.blend(canvas, (r, g, b)))
 
 object Image:
-  // cannot be @JSExport'ed due to implementation details
-  enum Transformation:
-    /**
-     * Move the current image origin to `p`
-     * @note is this useless? can't really find any usecase, so no function on `Image`s
-     */
-    case Shift(p: Point)
-
-    /**
-     * Crop the image to the rectangular region delimited by `start` (top-left) and `end` (bottom-right)
-     */
-    case Crop(start: Point, end: Point)
-
-    /**
-     * Rotate the image `angle` degrees (full turn = 360) counterclockwise, using `origin` as the rotation origin
-     */
-    case Rotate(angle: Double, origin: Point)
-
-    /**
-     * Same as `Rotate`, except around the center
-     */
-    case RotateAroundCenter(angle: Double)
-
-    /**
-     * Scale the image with the `factor`s
-     * @example Scale(0.5, 0.5) // scales the image to be half the size
-     *          Scale(2, 3)   // scales the image to be twice the width and three times the height
-     */
-    case Scale(factorX: Double, factorY: Double, algorithm: ScaleAlgorithm)
-
-    /**
-     * Scale the image to be `width`*`height`
-     */
-    case ScaleToSize(width: Int, height: Int, algorithm: ScaleAlgorithm)
-
-    /**
-     * Flip the image vertically
-     */
-    case VerticalFlip
-
-    /**
-     * Flip the image horizontally
-     */
-    case HorizontalFlip
-
-    /**
-     * Multiplies the image with a layer of the required color
-     */
-    case Blend(r: Int, g: Int, b: Int)
-
   enum ScaleAlgorithm:
     case NearestNeighbor
     case Classic
@@ -138,3 +85,25 @@ object Image:
     @JSExport
     val Classic = ScaleAlgorithm.Classic
   }
+
+  def load(url: String) =
+    val promise = Promise[Image]()
+    val canvas = Canvas.makeCanvas(0, 0)
+    val img = dom.window.document.createElement("img").asInstanceOf[html.Image]
+    img.addEventListener("load", { evt =>
+      canvas.width = img.width
+      canvas.height = img.height
+      canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D].drawImage(img, 0, 0)
+      promise.success(Image(canvas))
+    })
+    img.src = url
+    promise.future
+
+  @JSExportTopLevel("loadImage")
+  def loadJs(url: String) = js.Promise[Image]{ (resolve, reject) =>
+    load(url).andThen {
+      case Success(img) => resolve(img)
+      case Failure(ex) => reject(ex)
+    }
+  }
+

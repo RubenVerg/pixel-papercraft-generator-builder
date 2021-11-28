@@ -1,7 +1,7 @@
 package com.pixelpapercraft.generatorbuilder.builder.render
 
 import com.pixelpapercraft.generatorbuilder.builder.Image
-import com.pixelpapercraft.generatorbuilder.builder.Image.{ScaleAlgorithm, Transformation}
+import com.pixelpapercraft.generatorbuilder.builder.Image.ScaleAlgorithm
 import org.scalajs.dom
 import dom.{html, window}
 
@@ -19,93 +19,85 @@ object Canvas:
     canv.width = width.toInt
     canv.height = height.toInt
     canv
+  
+  def crop(canvas: html.Canvas, start: (Int, Int), end: (Int, Int)) =
+    val newCanvas = makeCanvas(end._1 - start._1, end._2 - start._2)
+    newCanvas.ctx2d.drawImage(
+      canvas,
+      start._1, start._2, end._1 - start._1, end._2 - start._2,
+      0, 0, end._1 - start._1, end._2 - start._2
+    )
+    newCanvas
+    
+  def scale(canvas: html.Canvas, dw: Int, dh: Int, algo: Image.ScaleAlgorithm) =
+    def classic() =
+      val newCanvas = makeCanvas(dw, dh)
+      newCanvas.ctx2d.drawImage(canvas, 0, 0, dw, dh)
+      newCanvas
+      
+    def nearestNeighbor() =
+      val data = canvas.ctx2d.getImageData(0, 0, canvas.width, canvas.height)
+      val newCanvas = makeCanvas(dw, dh)
+      val ctx = newCanvas.ctx2d
+      val factorX = dw / canvas.width.toDouble
+      val factorY = dh / canvas.height.toDouble
+      for 
+        x <- 0 until canvas.width
+        y <- 0 until canvas.height
+        cellId = data.width * y + x
+        r = data.data(cellId * 4 + 0)
+        g = data.data(cellId * 4 + 1)
+        b = data.data(cellId * 4 + 2)
+        a = data.data(cellId * 4 + 3)
+      do
+        ctx.fillStyle = s"rgba($r, $g, $b, ${a / 255d})"
+        ctx.fillRect(x * factorX, y * factorY, factorX, factorY)
+      newCanvas
+      
+    algo match {
+      case Image.ScaleAlgorithm.Classic => classic()
+      case Image.ScaleAlgorithm.NearestNeighbor => nearestNeighbor()
+    }
+    
+  def flipHorizontal(canvas: html.Canvas) =
+    val newCanvas = makeCanvas(canvas.width, canvas.height)
+    val ctx = newCanvas.ctx2d
+    ctx.save()
+    ctx.scale(-1, 1)
+    ctx.drawImage(canvas, -canvas.width, 0)
+    ctx.restore()
+    newCanvas
+    
+  def flipVertical(canvas: html.Canvas) =
+    val newCanvas = makeCanvas(canvas.width, canvas.height)
+    val ctx = newCanvas.ctx2d
+    ctx.save()
+    ctx.scale(1, -1)
+    ctx.drawImage(canvas, 0, -canvas.height)
+    ctx.restore()
+    newCanvas
+    
+  def blend(canvas: html.Canvas, color: (Int, Int, Int)) =
+    val newCanvas = makeCanvas(canvas.width, canvas.height)
+    val ctx = newCanvas.ctx2d
+    val data = canvas.ctx2d.getImageData(0, 0, canvas.width, canvas.height)
+    val newData = ctx.createImageData(data.width, data.height)
+    for
+      i <- 0 until data.data.length by 4
+      r = (data.data(i) * color._1 / 255d).toInt
+      g = (data.data(i + 1) * color._2 / 255d).toInt
+      b = (data.data(i + 2) * color._3 / 255d).toInt
+      a = data.data(i + 3)
+    do
+      newData.data(i) = r
+      newData.data(i + 1) = g
+      newData.data(i + 2) = b
+      newData.data(i + 3) = a
+    ctx.putImageData(newData, 0, 0)
+    newCanvas
 
   def drawImage(canvas: html.Canvas, image: Image, originX: Int, originY: Int) =
-    val promise = Promise[Unit]()
-    var tempCanvas = makeCanvas(0, 0)
-    tempCanvas.style.border = "2px dashed red"
-    val tempImg = window.document.createElement("img").as[html.Image]
-    tempImg.addEventListener("load", { evt =>
-      tempCanvas.width = tempImg.width
-      tempCanvas.height = tempImg.height
-      var tempCtx = tempCanvas.ctx2d
-      window.document.body.appendChild(tempCanvas)
-      tempCtx.drawImage(tempImg, 0, 0)
-      def willChangeCanvas(f: => html.Canvas) =
-        val prevCanvas = tempCanvas
-        val nowCanvas = f
-        tempCanvas = nowCanvas
-        tempCtx = tempCanvas.ctx2d
-        window.document.body.appendChild(nowCanvas)
-        window.document.body.insertBefore(prevCanvas, nowCanvas)
-        window.document.body.removeChild(prevCanvas)
-      for (tr <- image.transformations) do
-        tr match {
-          case Transformation.Crop(start, end) => willChangeCanvas {
-            val transformCanvas = makeCanvas(end._1 - start._1, end._2 - start._2)
-            transformCanvas.ctx2d.drawImage(
-              tempCanvas,
-              start._1, start._2, end._1 - start._1, end._2 - start._2,
-              0, 0, end._1 - start._1, end._2 - start._2
-            )
-            transformCanvas
-          }
-          case Transformation.Scale(fx, fy, alg) => willChangeCanvas {
-            alg match {
-              case ScaleAlgorithm.NearestNeighbor => scaleNearestNeighbor(tempCanvas, fx, fy)
-              case ScaleAlgorithm.Classic => scaleClassic(tempCanvas, fx, fy)
-            }
-          }
-          case Transformation.Shift(sx, sy) => willChangeCanvas {
-            val transformCanvas = makeCanvas(tempCanvas.width, tempCanvas.height)
-            transformCanvas.ctx2d.drawImage(tempCanvas, sx, sy)
-            transformCanvas
-          }
-          case Transformation.RotateAroundCenter(degrees) =>
-            willChangeCanvas(rotate(tempCanvas, (tempCanvas.width / 2, tempCanvas.height / 2), math.toRadians(degrees)))
-          case Transformation.Rotate(degrees, p) =>
-            willChangeCanvas(rotate(tempCanvas, p, math.toRadians(degrees)))
-          case Transformation.HorizontalFlip =>
-            tempCtx.save()
-            tempCtx.scale(-1, 1)
-            tempCtx.drawImage(tempCanvas, -tempCanvas.width, 0)
-            tempCtx.restore()
-          case Transformation.VerticalFlip =>
-            tempCtx.save()
-            tempCtx.scale(1, -1)
-            tempCtx.drawImage(tempCanvas, 0, -tempCanvas.height)
-            tempCtx.restore()
-          case Transformation.ScaleToSize(w, h, alg) => willChangeCanvas {
-            alg match {
-              case ScaleAlgorithm.NearestNeighbor => scaleNearestNeighbor(tempCanvas, w.toDouble / tempCanvas.width, h.toDouble / tempCanvas.height)
-              case ScaleAlgorithm.Classic => scaleClassic(tempCanvas, w.toDouble / tempCanvas.width, h.toDouble / tempCanvas.height)
-            }
-          }
-          case Transformation.Blend(r, g, b) => willChangeCanvas {
-            val transformationCanvas = makeCanvas(tempCanvas.width, tempCanvas.height)
-            val transformationCtx = transformationCanvas.ctx2d
-            val imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height)
-            val newImageData = transformationCtx.createImageData(imageData.width, imageData.height)
-            for
-              i <- 0 until imageData.data.length by 4
-              red = (imageData.data(i) * r / 255d).toInt
-              green = (imageData.data(i + 1) * g / 255d).toInt
-              blue = (imageData.data(i + 2) * b / 255d).toInt
-              alpha = imageData.data(i + 3)
-            do
-              newImageData.data(i) = red
-              newImageData.data(i + 1) = green
-              newImageData.data(i + 2) = blue
-              newImageData.data(i + 3) = alpha
-            transformationCtx.putImageData(newImageData, 0, 0)
-            transformationCanvas
-          }
-        }
-      canvas.ctx2d.drawImage(tempCanvas, originX, originY)
-      // window.document.body.removeChild(tempCanvas)
-    })
-    tempImg.src = image.url
-    promise.future
+    canvas.ctx2d.drawImage(image.canvas, originX, originY)
 
   def scaleClassic(canvas: html.Canvas, factorX: Double, factorY: Double) =
     val transformCanvas = makeCanvas(canvas.width * factorX, canvas.height * factorY)

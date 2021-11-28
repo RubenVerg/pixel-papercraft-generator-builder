@@ -3,28 +3,27 @@ import * as builder from 'generator-builder'
 import backgroundImage from './images/Background.png';
 import foldsImage from './images/Folds.png';
 
-const background = builder.Image(backgroundImage), folds = builder.Image(foldsImage)
+const background = builder.loadImage(backgroundImage), folds = builder.loadImage(foldsImage)
 
 const showFolds = builder.BooleanInput("Show Folds", true)
 const skin = builder.TextureInput("Skin", 64, 64, [builder.Texture()])
 
-function setup(generator) {
-  generator.pages[0].draw(background, 0, 0)
+async function setup(generator) {
+  generator.pages[0].draw(await background, 0, 0)
 }
 
-function change(generator) {
-  skin.read().then(img => {
-    drawHead(generator, img, 185, 117);
-    if (showFolds.read())
-      generator.pages[0].draw(folds, 0, 0);
-  });
+async function change(generator) {
+  const img = await skin.read();
+  drawHead(generator, img, 185, 117);
+  if (showFolds.read())
+    generator.pages[0].draw(await folds, 0, 0);
 }
 
 function drawHead(generator, skin, x, y) {
-  function drawRect(src1, src2, src3, src4, dst1, dst2, dst3, dst4, flip) {
+  async function drawRect(src1, src2, src3, src4, dst1, dst2, dst3, dst4, flip) {
     const img = skin
       .crop(src1, src2, src1 + src3, src2 + src4)
-      .scale(dst3 / src3, dst4 / src4)
+      .scaleTo(dst3, dst4)
     generator.pages[0].draw(flip ? img.flipVertical : img, dst1, dst2)
   }
 

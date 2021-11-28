@@ -1,6 +1,10 @@
 import * as generatorBuilder from 'generator-builder';
 import * as generators from './generators.js';
 
+// export default function() {
+
+console.log('Loading!');
+
 const generatorName = new URLSearchParams(window.location.search).get('generator')
 if (generatorName) {
   const generator = generators[generatorName];
@@ -8,6 +12,7 @@ if (generatorName) {
 
   generatorBuilder.BarebonesRenderer(generator);
 } else {
+  console.log('Showing generator list...');
   document.body.innerHTML = `
     <h1>Generators</h1>
     <ul>
@@ -15,3 +20,5 @@ if (generatorName) {
     </ul>
   `;
 }
+
+// }

@@ -29,10 +29,10 @@ export class Generator {
 
 export class Image {
   constructor(
-    url: string,
+    canvas: HTMLCanvasElement,
   );
 
-  public readonly url: string;
+  public readonly canvas: HTMLCanvasElement;
 
   // public transform(transformation: Transformation): Image;
 
@@ -46,24 +46,17 @@ export class Image {
   public crop(startX: number, startY: number, endX: number, endY: number): Image;
 
   /**
-     * Rotate the image around the chosen origin point
-     * @param angle Angle in degrees, counterclockwise, of rotation
-     * @param origin Whether the origin should be (0, 0) or the image center
-     */
-  public rotate(angle: number, origin: "top left" | "center"): Image;
-
-  /**
      * Rotate the image around the given rotational origin
      * @param angle Angle in degrees, counterclockwise, of rotation
      * @param originX x coordinate of the rotational origin
      * @param originY y coordinate of the rotational origin
      */
-  public rotate(angle: number, originX: number, originY: number): Image;
+  public rotate(angle: number, originX?: number, originY?: number): Image;
 
   /**
      * Scale the image by a factor of `factorX`*`factorY`
      */
-  public scale(factorX: number, factorY: number, algorithm?: ScaleAlgorithm): Image;
+  public scaleBy(factorX: number, factorY: number, algorithm?: ScaleAlgorithm): Image;
 
   public scaleTo(width: number, height: number, algorithm?: ScaleAlgorithm): Image;
 
@@ -83,6 +76,8 @@ export class Image {
      */
   public blend(r: number, g: number, b: number): Image;
 }
+
+export function loadImage(url: string): Promise<Image>;
 
 export enum ScaleAlgorithm {
   NearestNeighbor,
@@ -109,9 +104,9 @@ export const PageSizes: {
   },
 }
 
-export class Texture extends Image {
-  constructor(url?: string);
-}
+export class Texture extends Image { }
+
+export function loadTexture(url: string): Promise<Texture>
 
 class Input<A> {
   public create(): string;

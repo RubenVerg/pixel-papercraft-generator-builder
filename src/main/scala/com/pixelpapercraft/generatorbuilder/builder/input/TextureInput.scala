@@ -32,7 +32,7 @@ case class TextureInput(label: String, width: Int, height: Int, choices: js.Arra
     id().get
 
   override def read() =
-    id().map(RenderInputs.getImage).getOrElse(Future.successful("data:image/png;base64,")).map(Texture(_))
+    id().map(RenderInputs.getImage).getOrElse(Future.successful("data:image/png;base64,")).flatMap(Texture.load(_))
 
   @JSExport("read")
   def readJS() = js.Promise[Texture]{ (resolve, reject) =>
