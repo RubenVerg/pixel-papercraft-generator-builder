@@ -2,37 +2,48 @@ package com.pixelpapercraft.generatorbuilder.builder.render
 
 import com.pixelpapercraft.generatorbuilder.builder.Image
 import com.pixelpapercraft.generatorbuilder.builder.Image.{ScaleAlgorithm, Transformation}
-import org.scalajs.dom.{CanvasRenderingContext2D, HTMLCanvasElement, HTMLImageElement, window}
+import org.scalajs.dom
+import dom.{html, window}
 
 import scala.concurrent.Promise
 
+extension (el: dom.Element)
+  def as[A <: dom.Element] = el.asInstanceOf[A]
+
+extension (canv: html.Canvas)
+  def ctx2d = canv.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
+
 object Canvas:
-  def drawImage(canvas: HTMLCanvasElement, image: Image, originX: Int, originY: Int) =
+  def makeCanvas(width: Double, height: Double) =
+    val canv = window.document.createElement("canvas").as[html.Canvas]
+    canv.width = width.toInt
+    canv.height = height.toInt
+    canv
+
+  def drawImage(canvas: html.Canvas, image: Image, originX: Int, originY: Int) =
     val promise = Promise[Unit]()
-    var tempCanvas = window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement]
+    var tempCanvas = makeCanvas(0, 0)
     tempCanvas.style.border = "2px dashed red"
-    val tempImg = window.document.createElement("img").asInstanceOf[HTMLImageElement]
+    val tempImg = window.document.createElement("img").as[html.Image]
     tempImg.addEventListener("load", { evt =>
       tempCanvas.width = tempImg.width
       tempCanvas.height = tempImg.height
-      var tempCtx = tempCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+      var tempCtx = tempCanvas.ctx2d
       window.document.body.appendChild(tempCanvas)
       tempCtx.drawImage(tempImg, 0, 0)
-      def willChangeCanvas(f: => HTMLCanvasElement) =
+      def willChangeCanvas(f: => html.Canvas) =
         val prevCanvas = tempCanvas
         val nowCanvas = f
         tempCanvas = nowCanvas
-        tempCtx = tempCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+        tempCtx = tempCanvas.ctx2d
         window.document.body.appendChild(nowCanvas)
         window.document.body.insertBefore(prevCanvas, nowCanvas)
         window.document.body.removeChild(prevCanvas)
       for (tr <- image.transformations) do
         tr match {
           case Transformation.Crop(start, end) => willChangeCanvas {
-            val transformCanvas = window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement]
-            transformCanvas.width = end._1 - start._1
-            transformCanvas.height = end._2 - start._2
-            transformCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D].drawImage(
+            val transformCanvas = makeCanvas(end._1 - start._1, end._2 - start._2)
+            transformCanvas.ctx2d.drawImage(
               tempCanvas,
               start._1, start._2, end._1 - start._1, end._2 - start._2,
               0, 0, end._1 - start._1, end._2 - start._2
@@ -46,26 +57,14 @@ object Canvas:
             }
           }
           case Transformation.Shift(sx, sy) => willChangeCanvas {
-            val transformCanvas = window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement]
-            transformCanvas.width = tempCanvas.width
-            transformCanvas.height = tempCanvas.height
-            transformCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D].drawImage(
-              tempCanvas, sx, sy
-            )
+            val transformCanvas = makeCanvas(tempCanvas.width, tempCanvas.height)
+            transformCanvas.ctx2d.drawImage(tempCanvas, sx, sy)
             transformCanvas
           }
           case Transformation.RotateAroundCenter(degrees) =>
-            tempCtx.save()
-            tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2)
-            tempCtx.rotate(math.toRadians(degrees))
-            tempCtx.translate(-tempCanvas.width / 2, -tempCanvas.height / 2)
-            tempCtx.restore()
-          case Transformation.Rotate(degrees, (x, y)) =>
-            tempCtx.save()
-            tempCtx.translate(x, y)
-            tempCtx.rotate(math.toRadians(degrees))
-            tempCtx.translate(-x, -y)
-            tempCtx.restore()
+            willChangeCanvas(rotate(tempCanvas, (tempCanvas.width / 2, tempCanvas.height / 2), math.toRadians(degrees)))
+          case Transformation.Rotate(degrees, p) =>
+            willChangeCanvas(rotate(tempCanvas, p, math.toRadians(degrees)))
           case Transformation.HorizontalFlip =>
             tempCtx.save()
             tempCtx.scale(-1, 1)
@@ -83,8 +82,8 @@ object Canvas:
             }
           }
           case Transformation.Blend(r, g, b) => willChangeCanvas {
-            val transformationCanvas = window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement]
-            val transformationCtx = transformationCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+            val transformationCanvas = makeCanvas(tempCanvas.width, tempCanvas.height)
+            val transformationCtx = transformationCanvas.ctx2d
             val imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height)
             val newImageData = transformationCtx.createImageData(imageData.width, imageData.height)
             for
@@ -102,27 +101,22 @@ object Canvas:
             transformationCanvas
           }
         }
-      canvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D].drawImage(tempCanvas, originX, originY)
+      canvas.ctx2d.drawImage(tempCanvas, originX, originY)
       // window.document.body.removeChild(tempCanvas)
     })
     tempImg.src = image.url
     promise.future
 
-  def scaleClassic(canvas: HTMLCanvasElement, factorX: Double, factorY: Double) =
-    val transformCanvas = window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement]
-    transformCanvas.width = (canvas.width * factorX).toInt
-    transformCanvas.height = (canvas.height * factorY).toInt
-    transformCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
-      .drawImage(canvas, 0, 0, canvas.width * factorX, canvas.height * factorY)
+  def scaleClassic(canvas: html.Canvas, factorX: Double, factorY: Double) =
+    val transformCanvas = makeCanvas(canvas.width * factorX, canvas.height * factorY)
+    transformCanvas.ctx2d.drawImage(canvas, 0, 0, canvas.width * factorX, canvas.height * factorY)
     transformCanvas
 
   // Adapted from https://stackoverflow.com/a/7815428/11974245, this function is shared as CC BY-SA 3.0
-  def scaleNearestNeighbor(canvas: HTMLCanvasElement, factorX: Double, factorY: Double) =
-    val data = canvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D].getImageData(0, 0, canvas.width, canvas.height)
-    val transformCanvas = window.document.createElement("canvas").asInstanceOf[HTMLCanvasElement]
-    transformCanvas.width = (canvas.width * factorX).toInt
-    transformCanvas.height = (canvas.height * factorY).toInt
-    val ctx = transformCanvas.getContext("2d").asInstanceOf[CanvasRenderingContext2D]
+  def scaleNearestNeighbor(canvas: html.Canvas, factorX: Double, factorY: Double) =
+    val data = canvas.ctx2d.getImageData(0, 0, canvas.width, canvas.height)
+    val transformCanvas = makeCanvas(canvas.width * factorX, canvas.height * factorY)
+    val ctx = transformCanvas.ctx2d
     for
       x <- 0 until canvas.width
       y <- 0 until canvas.height
@@ -136,3 +130,13 @@ object Canvas:
       ctx.fillStyle = s"rgba($red, $green, $blue, ${alpha / 255})"
       ctx.fillRect(x * factorX, y * factorY, factorX, factorY)
     transformCanvas
+
+  def rotate(canvas: html.Canvas, point: (Int, Int), angle: Double) =
+    val transformationCanvas = makeCanvas(math.max(canvas.width, canvas.height)/* * 2*/, math.max(canvas.width, canvas.height)/* * 2*/)
+    val transformationCtx = transformationCanvas.ctx2d
+    transformationCtx.save()
+    transformationCtx.translate(transformationCanvas.width / 2, transformationCanvas.height / 2)
+    transformationCtx.rotate(angle)
+    transformationCtx.drawImage(canvas, -point._1, -point._2)
+    transformationCtx.restore()
+    transformationCanvas
