@@ -138,4 +138,20 @@ export class TextureInput extends Input<Promise<Texture>> {
   constructor(label: string, width: number, height: number, choices: Texture[]);
 }
 
+export class NumberInput extends Input<number> {
+  constructor(label: string, min: number, max: number, step: number);
+}
+
+export class RangeInput extends Input<number> {
+  constructor(label: string, min: number, max: number, step: number);
+}
+
+export class TextInput extends Input<string> {
+  constructor(label: string, def: string);
+}
+
+export class ColorInput extends Input<[number, number, number]> {
+  constructor(label: string, defaultRed: number, defaultGreen: number, defaultBlue: number);
+}
+
 }

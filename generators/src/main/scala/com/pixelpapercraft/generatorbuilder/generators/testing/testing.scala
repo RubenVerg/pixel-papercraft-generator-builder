@@ -3,11 +3,13 @@ package generators.testing
 
 import builder.*
 import Image.ScaleAlgorithm
-import input.ButtonInput
+import input.{ButtonInput, ColorInput}
 
 import scalajs.js
 import js.JSConverters.*
 import scala.scalajs.js.annotation.JSExportTopLevel
+
+val color = ColorInput("color test", (0x90, 0x81, 0x4d))
 
 val grid = Image(Base64Images.grid)
 val steve = Texture(Base64Images.steve)
@@ -60,14 +62,13 @@ def drawPage4(generator: Generator) =
     "#8AB689",
     "#83B593",
     "#86B87F",
-    "#86B783",
-    "#80B497"
-  ) map { hex =>
+    "#86B783"
+  ).map { hex =>
     val red = Integer.parseInt(hex.slice(1, 3), 16)
     val green = Integer.parseInt(hex.slice(3, 5), 16)
     val blue = Integer.parseInt(hex.slice(5, 7), 16)
     (red, green, blue)
-  }
+  }.appended(color.read())
 
   for
     row <- 0 until Config.rowCount
@@ -225,5 +226,5 @@ def change(generator: Generator) =
   pageAmount = 5,
   setup = setup,
   change = change,
-  inputs = Seq(button)//.toJSArray
+  inputs = Seq(button, color)
 )

@@ -78,3 +78,48 @@ object RenderInputs:
       p(id := bid)(text)
     ).render)
     bid
+
+  def createRange(lbl: String, n: Double, x: Double, s: Double) =
+    val bid = mkid("range")
+    window.document.body.appendChild(div(
+      label(`for` := bid)(lbl),
+      input(`type` := "range", min := n, max := x, step := s, id := bid)
+    ).render)
+    bid
+
+  def getRange(id: String) =
+    window.document.querySelector(s"#$id").asInstanceOf[HTMLInputElement].value.toDouble
+
+  def createNumber(lbl: String, n: Double, x: Double, s: Double) =
+    val bid = mkid("number")
+    window.document.body.appendChild(div(
+      label(`for` := bid)(lbl),
+      input(`type` := "number", min := n, max := x, step := s, id := bid)
+    ).render)
+    bid
+
+  def getNumber(id: String) =
+    window.document.querySelector(s"#$id").asInstanceOf[HTMLInputElement].value.toDouble
+
+  def createInput(lbl: String, default: String) =
+    val bid = mkid("input")
+    window.document.body.appendChild(div(
+      label(`for` := bid)(lbl),
+      input(`type` := "text", value := default, id := bid)
+    ).render)
+    bid
+
+  def getInput(id: String) =
+    window.document.querySelector(s"#$id").asInstanceOf[HTMLInputElement].value
+
+  def createColor(lbl: String, default: (Int, Int, Int)) =
+    val bid = mkid("input")
+    window.document.body.appendChild(div(
+      label(`for` := bid)(lbl),
+      input(`type` := "color", value := s"#${default._1.toHexString}${default._2.toHexString}${default._3.toHexString}", id := bid)
+    ).render)
+    bid
+
+  def getColor(id: String) =
+    val str = window.document.querySelector(s"#$id").asInstanceOf[HTMLInputElement].value.tail
+    (Integer.parseInt(str.slice(0, 2), 16), Integer.parseInt(str.slice(2, 4), 16), Integer.parseInt(str.slice(4, 6), 16))
