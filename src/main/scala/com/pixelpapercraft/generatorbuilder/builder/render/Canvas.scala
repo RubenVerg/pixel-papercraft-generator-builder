@@ -98,7 +98,21 @@ object Canvas:
     newCanvas
 
   def rotate(canvas: html.Canvas, point: (Int, Int), angle: Double) =
-    val newCanvas = makeCanvas(math.max(canvas.width, canvas.height)/* * 2*/, math.max(canvas.width, canvas.height)/* * 2*/)
+    def findLengths() =
+      val points = Seq((0, 0), (0, canvas.height), (canvas.width, 0), (canvas.width, canvas.height))
+      val rotatedPoints = points.map { point =>
+        (point._1 * math.cos(angle) + point._2 * math.sin(angle), point._1 * math.sin(angle) + point._2 * math.cos(angle))
+      }
+      val maxX = rotatedPoints.map(_._1).max
+      val minX = rotatedPoints.map(_._1).min
+      val maxY = rotatedPoints.map(_._2).max
+      val minY = rotatedPoints.map(_._2).min
+
+      (math.abs(maxX - minX), math.abs(maxY - minY))
+
+    val (dw, dh) = findLengths()
+
+    val newCanvas = makeCanvas(dw, dh)
     val ctx = newCanvas.ctx2d
     ctx.save()
     ctx.translate(newCanvas.width / 2, newCanvas.height / 2)

@@ -42,7 +42,7 @@ case class Image(canvas: html.Canvas):
    */
   @JSExport
   def rotate(angle: Double, originX: Int = width / 2, originY: Int = height / 2) =
-    Image(Canvas.rotate(canvas, (originX, originY), angle))
+    Image(Canvas.rotate(canvas, (originX, originY), math.toRadians(angle)))
 
   /**
    * Scale the image by a factor of `factorX`*`factorY`

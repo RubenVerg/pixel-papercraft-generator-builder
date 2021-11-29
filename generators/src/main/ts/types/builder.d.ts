@@ -34,6 +34,9 @@ export class Image {
 
   public readonly canvas: HTMLCanvasElement;
 
+  public get width(): number;
+  public get height(): number;
+
   // public transform(transformation: Transformation): Image;
 
   /**
