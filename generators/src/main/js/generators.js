@@ -1,8 +1,8 @@
 import * as builder from 'generator-builder';
-import _exampleJS from './generators/example/example.js';
-import _exampleTS from '../ts-out/generators/example/index.js';
+import exampleJS from './generators/example/example.js';
+import exampleTS from '../ts-out/generators/example/index.js';
+import weee from '../ts-out/generators/weee/index.js';
 
-export const testing = builder.testingGenerator;
-export const exampleScala = builder.exampleGenerator;
-export const exampleJS = _exampleJS;
-export const exampleTS = _exampleTS;
+export default {
+  exampleJS, exampleTS, exampleScala: builder.exampleGenerator, testing: builder.testingGenerator, weee
+};

@@ -1,5 +1,5 @@
 import * as generatorBuilder from 'generator-builder';
-import * as generators from './generators.js';
+import generators from './generators.js';
 
 // export default function() {
 
