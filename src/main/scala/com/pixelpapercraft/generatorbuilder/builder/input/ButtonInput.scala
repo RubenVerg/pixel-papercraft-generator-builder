@@ -6,6 +6,11 @@ import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalajs.js
 
+/**
+ * A clickable button
+ * @param label The label on the button
+ * @param callback A function to be called on click
+ */
 @JSExportTopLevel("ButtonInput")
 case class ButtonInput(label: String, callback: js.Function0[Unit])
   extends Input[Unit](label):
@@ -21,4 +26,10 @@ case class ButtonInput(label: String, callback: js.Function0[Unit])
   override def read(): Unit = ()
 
 object ButtonInput:
+  /**
+   * Alternative constructor allowing for more idiomatic Scala brace style
+   * @example {{{
+   *            ButtonInput("my button") { println("button clicked!") }
+   * }}}
+   */
   def apply(label: String)(callback: () => Unit): ButtonInput = ButtonInput(label, callback)

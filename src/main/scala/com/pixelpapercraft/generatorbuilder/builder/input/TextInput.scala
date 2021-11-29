@@ -5,6 +5,11 @@ import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
+/**
+ * An input representing a free-form piece of text
+ * @param label A textual description of the input
+ * @param default The default text in the input
+ */
 @JSExportTopLevel("TextInput")
 case class TextInput(label: String, default: String)
   extends Input[String](label):

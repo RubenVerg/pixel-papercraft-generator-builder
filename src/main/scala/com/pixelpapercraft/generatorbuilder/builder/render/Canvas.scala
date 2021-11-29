@@ -34,7 +34,8 @@ object Canvas:
       val newCanvas = makeCanvas(dw, dh)
       newCanvas.ctx2d.drawImage(canvas, 0, 0, dw, dh)
       newCanvas
-      
+
+    // Adapted from https://stackoverflow.com/a/7815428/11974245, this function is shared as CC BY-SA 3.0
     def nearestNeighbor() =
       val data = canvas.ctx2d.getImageData(0, 0, canvas.width, canvas.height)
       val newCanvas = makeCanvas(dw, dh)
@@ -96,39 +97,15 @@ object Canvas:
     ctx.putImageData(newData, 0, 0)
     newCanvas
 
+  def rotate(canvas: html.Canvas, point: (Int, Int), angle: Double) =
+    val newCanvas = makeCanvas(math.max(canvas.width, canvas.height)/* * 2*/, math.max(canvas.width, canvas.height)/* * 2*/)
+    val ctx = newCanvas.ctx2d
+    ctx.save()
+    ctx.translate(newCanvas.width / 2, newCanvas.height / 2)
+    ctx.rotate(angle)
+    ctx.drawImage(canvas, -point._1, -point._2)
+    ctx.restore()
+    newCanvas
+
   def drawImage(canvas: html.Canvas, image: Image, originX: Int, originY: Int) =
     canvas.ctx2d.drawImage(image.canvas, originX, originY)
-
-  def scaleClassic(canvas: html.Canvas, factorX: Double, factorY: Double) =
-    val transformCanvas = makeCanvas(canvas.width * factorX, canvas.height * factorY)
-    transformCanvas.ctx2d.drawImage(canvas, 0, 0, canvas.width * factorX, canvas.height * factorY)
-    transformCanvas
-
-  // Adapted from https://stackoverflow.com/a/7815428/11974245, this function is shared as CC BY-SA 3.0
-  def scaleNearestNeighbor(canvas: html.Canvas, factorX: Double, factorY: Double) =
-    val data = canvas.ctx2d.getImageData(0, 0, canvas.width, canvas.height)
-    val transformCanvas = makeCanvas(canvas.width * factorX, canvas.height * factorY)
-    val ctx = transformCanvas.ctx2d
-    for
-      x <- 0 until canvas.width
-      y <- 0 until canvas.height
-      cellId = data.width * y + x
-      red = data.data(cellId * 4 + 0)
-      green = data.data(cellId * 4 + 1)
-      blue = data.data(cellId * 4 + 2)
-      alpha = data.data(cellId * 4 + 3)
-    do
-      // println(s"Drawing $factorX * $factorY rect at $x, $y")
-      ctx.fillStyle = s"rgba($red, $green, $blue, ${alpha / 255})"
-      ctx.fillRect(x * factorX, y * factorY, factorX, factorY)
-    transformCanvas
-
-  def rotate(canvas: html.Canvas, point: (Int, Int), angle: Double) =
-    val transformationCanvas = makeCanvas(math.max(canvas.width, canvas.height)/* * 2*/, math.max(canvas.width, canvas.height)/* * 2*/)
-    val transformationCtx = transformationCanvas.ctx2d
-    transformationCtx.save()
-    transformationCtx.translate(transformationCanvas.width / 2, transformationCanvas.height / 2)
-    transformationCtx.rotate(angle)
-    transformationCtx.drawImage(canvas, -point._1, -point._2)
-    transformationCtx.restore()
-    transformationCanvas

@@ -6,6 +6,11 @@ import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalajs.js
 
+/**
+ * An input representing a choice between one of several options
+ * @param label A textual description of the input
+ * @param options The options to choose from
+ */
 @JSExportTopLevel("SelectInput")
 case class SelectInput(label: String, options: js.Array[String])
   extends Input[String](label):

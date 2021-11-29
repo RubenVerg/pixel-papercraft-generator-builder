@@ -4,6 +4,9 @@ import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
+/**
+ * A paragraph of text
+ */
 @JSExportTopLevel("Text")
 case class Text(text: String) extends Input[Nothing](text):
   @JSExport

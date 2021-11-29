@@ -5,6 +5,11 @@ import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
+/**
+ * An input representing a toggle or checkbox
+ * @param label A textual description of the input
+ * @param default The default value for the toggle
+ */
 @JSExportTopLevel("BooleanInput")
 case class BooleanInput(label: String, default: Boolean)
   extends Input[Boolean](label):

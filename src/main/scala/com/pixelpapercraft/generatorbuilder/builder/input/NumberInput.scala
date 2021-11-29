@@ -5,6 +5,13 @@ import com.pixelpapercraft.generatorbuilder.builder.render.RenderInputs
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
+/**
+ * An input representing a precise number
+ * @param label A textual description of the input
+ * @param min Minimum value the number can take
+ * @param max Maximum value the number can take
+ * @param step How much to increase with each button press
+ */
 @JSExportTopLevel("NumberInput")
 case class NumberInput(label: String, min: Double = 0, max: Double = 10, step: Double = 0.5)
   extends Input[Double](label):

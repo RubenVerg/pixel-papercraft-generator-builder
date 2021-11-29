@@ -6,6 +6,20 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalajs.js
 import js.JSConverters.*
 
+/**
+ * A generator
+ * 
+ * This is the class you want to export from your main files
+ * @param id The generator's ID. Make this match with the export name in the `generators.js` file.
+ * @param name The generator's readable name
+ * @param thumbnail Currently unused, provide `()` or `undefined` or really any value you like
+ * @param video Currently unused, provide `()` or `undefined` or really any value you like
+ * @param instructions Instructions to be shown above the inputs
+ * @param pageAmount How many pages this generator should have
+ * @param setup A function to be called once to set up everything, and when an input changes to resetup everthing 
+ * @param change A function to be called when an input changes, to draw stuff
+ * @param inputs A list of [[com.pixelpapercraft.generatorbuilder.builder.input.Input]]s that the generator depends on
+ */
 @JSExportTopLevel("Generator")
 case class Generator (
                       @JSExport id: String,
@@ -24,6 +38,9 @@ case class Generator (
   private[builder] var drawListener: (Page, Image, Int, Int) => Unit =
     (_: Page, _: Image, _: Int, _: Int) => println("if you see this, there's a bug somewhere")
 
+  /**
+   * The pages of this generator, access them to draw
+   */
   @JSExport val pages: js.Array[Page] = js.Array(Seq.fill(pageAmount)(0).zipWithIndex.map((_, idx) => Page(this, idx))*)
 
   @JSExport def runSetup(generator: Generator) =

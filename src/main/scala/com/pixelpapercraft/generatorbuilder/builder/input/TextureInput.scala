@@ -13,12 +13,11 @@ import scala.util.{Failure, Success}
 /**
  * An input for a Minecraft texture
  *
- * @param label This texture's name
+ * @param label A textual description of this input
  * @param width Width of the default resolution
  * @param height Height of the default resolution
  * @param choices A set of suggested default choices
  */
-
 @JSExportTopLevel("TextureInput")
 case class TextureInput(label: String, width: Int, height: Int, choices: js.Array[Texture])
   extends Input[Future[Texture]](label):

@@ -10,13 +10,13 @@
     "build:web": "NODE_ENV=production webpack",
     "build:ts": "npm run setup:ts && tsc",
     "build:scala": "sbt \"generators / fullLinkJS\"",
-    "build:res": "rescript build",
-    "build": "npm run build:scala && npm run build:ts && npm run build:res && npm run build:web",
+    "build": "npm run build:scala && npm run build:ts && npm run build:web",
     "start:web": "webpack serve",
     "start:ts": "npm run setup:ts && concurrently -n copy,tsc \"watch -p 'generators/src/main/ts/**/*' -c 'npm run setup:ts'\" \"tsc --watch\"",
     "start:scala": "sbt \"~generators / fastLinkJS\"",
-    "start:res": "rescript build -w",
-    "start": "concurrently 'npm:start:*'"
+    "start": "concurrently 'npm:start:*'",
+    "doc:scala": "sbt doc",
+    "doc": "concurrently 'npm:doc:*'"
   },
   "devDependencies": {
     "@babel/core": "7.15.5",

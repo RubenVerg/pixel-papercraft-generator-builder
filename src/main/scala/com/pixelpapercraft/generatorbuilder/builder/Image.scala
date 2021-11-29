@@ -12,7 +12,10 @@ import scala.util.{Failure, Success}
 
 type Point = (Int, Int)
 
-// Lazy images, they don't store the data, just an URL and a sequence of transformations
+/**
+ * An `Image` represents the core class for any image in your code, that can be transformed
+ * @param canvas The underlying canvas containing this image's data
+ */
 @JSExportTopLevel("Image")
 case class Image(canvas: html.Canvas):
   import Image.*
@@ -86,6 +89,11 @@ object Image:
     val Classic = ScaleAlgorithm.Classic
   }
 
+  /**
+   * Asyncronously loads an image from an URL and then pastes it onto a canvas and gives that to an `Image`
+   * @param url URL to fetch the image from. CORS and friends apply.
+   * @return A [[scala.concurrent.Future]] containing the image. The exported JavaScript function `loadImage` returns a [[scala.scalajs.js.Promise]] instead.
+   */
   def load(url: String) =
     val promise = Promise[Image]()
     val canvas = Canvas.makeCanvas(0, 0)
@@ -99,6 +107,9 @@ object Image:
     img.src = url
     promise.future
 
+  /**
+   * @see [[com.pixelpapercraft.generatorbuilder.builder.Image.load()]]
+   */
   @JSExportTopLevel("loadImage")
   def loadJs(url: String) = js.Promise[Image]{ (resolve, reject) =>
     load(url).andThen {
